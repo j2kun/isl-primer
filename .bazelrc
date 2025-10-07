@@ -1,0 +1,24 @@
+common --enable_bzlmod
+common --enable_workspace
+
+# compilation_mode options below are `dbg` (debug symbols) `fastbuild`
+# (build as quickly as possible), and `opt` (turn on all optimizations)
+common -c dbg
+
+common --action_env=BAZEL_CXXOPTS=-std=c++20
+common --cxxopt='-std=c++20'
+common --copt=-fdiagnostics-color=always
+common --test_output=errors
+common --test_summary=terse
+
+# prevents changes to PATH from causing a full rebuild
+common --incompatible_strict_action_env
+
+# run with --config=asan to enable
+build:asan --strip=never
+build:asan --copt -fsanitize=address
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -O1
+build:asan --copt -g
+build:asan --copt -fno-omit-frame-pointer
+build:asan --linkopt -fsanitize=address

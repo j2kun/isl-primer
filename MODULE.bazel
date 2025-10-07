@@ -1,0 +1,4 @@
+module(name = "isl-primer")
+
+bazel_dep(name = "rules_cc", version = "0.2.0")
+bazel_dep(name = "rules_license", version = "1.0.0")
