@@ -2,3 +2,25 @@ module(name = "isl-primer")
 
 bazel_dep(name = "rules_cc", version = "0.2.0")
 bazel_dep(name = "rules_license", version = "1.0.0")
+bazel_dep(name = "googletest", version = "1.16.0")
+
+# compile_commands extracts the relevant compile data from bazel into
+# `compile_commands.json` so that clangd, clang-tidy, etc., can use it.
+# Whenever a build file changes, you must re-run
+#
+#   bazel run @hedron_compile_commands//:refresh_all
+#
+# to ingest new data into these tools.
+#
+# See the project repo for more details and configuration options
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+#
+# For the override pointing to a different repo, see
+# https://github.com/hedronvision/bazel-compile-commands-extractor/pull/219
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    commit = "02d15621b528efd877f5d5657c4b738523a0eb17",
+    remote = "https://github.com/mikael-s-persson/bazel-compile-commands-extractor",
+)
+

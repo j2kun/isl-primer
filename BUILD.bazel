@@ -1,0 +1,27 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+
+cc_library(
+    name = "isl_api_examples",
+    srcs = ["isl_api_examples.cpp"],
+    hdrs = ["isl_api_examples.h"],
+    deps = ["@isl"],
+)
+
+cc_binary(
+    name = "isl_api_examples_bin",
+    srcs = ["isl_api_examples_bin.cpp"],
+    deps = [":isl_api_examples"],
+)
+
+cc_test(
+    name = "isl_api_examples_test",
+    srcs = ["isl_api_examples_test.cpp"],
+    deps = [
+        ":isl_api_examples",
+        "@googletest//:gtest_main",
+    ],
+)
+
