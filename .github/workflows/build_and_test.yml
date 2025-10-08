@@ -22,3 +22,7 @@ jobs:
       - name: "Run `bazel test`"
         run: |
           bazel test -c opt //...
+
+      - name: "Run `bazel test --config=asan`"
+        run: |
+          bazel test --config=asan //...
