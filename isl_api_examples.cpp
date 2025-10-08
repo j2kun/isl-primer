@@ -10,9 +10,9 @@
 #include "include/isl/space.h"
 
 std::string parse_map_and_extract_domain_as_string(isl_ctx* ctx,
-                                                   std::string islStr) {
+                                                   std::string isl_str) {
   isl_set* domainMap =
-      isl_map_domain(isl_map_read_from_str(ctx, islStr.c_str()));
+      isl_map_domain(isl_map_read_from_str(ctx, isl_str.c_str()));
   char* result_str = isl_set_to_str(domainMap);
   std::string result(result_str);
 
@@ -97,4 +97,39 @@ std::string precompose_transposition(isl_ctx* ctx, std::string starting_layout,
   free(result_str);
   isl_map_free(composed);
   return result;
+}
+
+void print_matrices(isl_ctx* ctx, std::string isl_str) {
+  isl_basic_set* set = isl_basic_set_read_from_str(ctx, isl_str.c_str());
+
+  // 2. Extract and print the equality matrix.
+  // Each row in this matrix represents a constraint of the form `expr = 0`.
+  // The columns are ordered: set dimensions, parameters, divisor, constant.
+  isl_mat* eq_mat = isl_basic_set_equalities_matrix(
+      set, isl_dim_set, isl_dim_div, isl_dim_param, isl_dim_cst);
+
+  std::cout << "Equality Matrix:\n" << std::endl;
+  if (isl_mat_rows(eq_mat) == 0) {
+    std::cout << "(No equalities)" << std::endl;
+  } else {
+    isl_mat_print(eq_mat, stdout, ISL_FORMAT_ISL);
+    std::cout << std::endl;
+  }
+
+  std::cout << "\n" << std::endl;
+
+  isl_mat* ineq_mat = isl_basic_set_inequalities_matrix(
+      set, isl_dim_set, isl_dim_param, isl_dim_div, isl_dim_cst);
+
+  std::cout << "Inequality Matrix:\n" << std::endl;
+  if (isl_mat_rows(ineq_mat) == 0) {
+    std::cout << "(No inequalities)" << std::endl;
+  } else {
+    isl_mat_print(ineq_mat, stdout, ISL_FORMAT_ISL);
+    std::cout << std::endl;
+  }
+
+  isl_mat_free(eq_mat);
+  isl_mat_free(ineq_mat);
+  isl_basic_set_free(set);
 }
