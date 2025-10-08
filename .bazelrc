@@ -1,5 +1,4 @@
 common --enable_bzlmod
-common --enable_workspace
 
 # compilation_mode options below are `dbg` (debug symbols) `fastbuild`
 # (build as quickly as possible), and `opt` (turn on all optimizations)
