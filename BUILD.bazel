@@ -11,8 +11,8 @@ cc_library(
 )
 
 cc_binary(
-    name = "isl_api_examples_bin",
-    srcs = ["isl_api_examples_bin.cpp"],
+    name = "get_domain",
+    srcs = ["get_domain.cpp"],
     deps = [":isl_api_examples"],
 )
 

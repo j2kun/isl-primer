@@ -1,8 +1,9 @@
 // A binary that runs parse_map_and_extract_domain_as_string from a stdin string
 
-#include "isl_api_examples.h"
 #include <iostream>
 #include <string>
+
+#include "isl_api_examples.h"
 #include "include/isl/ctx.h"
 
 int main() {
