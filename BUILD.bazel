@@ -2,7 +2,6 @@ load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
-
 cc_library(
     name = "isl_api_examples",
     srcs = ["isl_api_examples.cpp"],
@@ -16,6 +15,12 @@ cc_binary(
     deps = [":isl_api_examples"],
 )
 
+cc_binary(
+    name = "precompose_transposition",
+    srcs = ["precompose_transposition.cpp"],
+    deps = [":isl_api_examples"],
+)
+
 cc_test(
     name = "isl_api_examples_test",
     srcs = ["isl_api_examples_test.cpp"],
@@ -24,4 +29,3 @@ cc_test(
         "@googletest//:gtest_main",
     ],
 )
-
