@@ -36,9 +36,9 @@ TEST(IslApiExamplesTest, TestPrecomposeTransposition) {
       "1024 and 0 <= lane < 16 and i + j * 32 + k * 32 * 64 = 16 * reg + lane "
       "}";
   std::string expected =
-      "{ S[i, j, k] -> [reg, lane] : (-32i - j + 16reg + lane) mod 2048 = 0 "
-      "and 0 <= i <= 63 and 0 <= j <= 31 and lane >= 32i + j - 16reg and 0 <= "
-      "lane <= 15 and lane <= 2095104 + 32i + j - 16reg }";
+      "{ S[i, j, k] -> [reg, lane = 32i + j + 2048k - 16reg] : 0 <= i <= 63 "
+      "and 0 <= j <= 31 and 0 <= k <= 1023 and -15 + 32i + j + 2048k <= 16reg "
+      "<= 32i + j + 2048k }";
 
   isl_ctx* ctx = isl_ctx_alloc();
   std::string actual = precompose_transposition(ctx, islMap, 0, 1);

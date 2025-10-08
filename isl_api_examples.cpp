@@ -54,17 +54,35 @@ std::string precompose_transposition(isl_ctx* ctx, std::string starting_layout,
   isl_map_free(domain_map);
   unsigned num_domain_vars = isl_space_dim(transpose_space, isl_dim_in);
 
-  isl_mat* eq_mat = create_empty_constraint_matrix(transpose_space, 2);
+  isl_mat* eq_mat =
+      create_empty_constraint_matrix(transpose_space, num_domain_vars);
   isl_mat* ineq_mat = create_empty_constraint_matrix(transpose_space, 0);
 
   // Column order is: [domain_vars, range_vars, div_vars, symbol_vars, constant]
-  // First constraint: domain_var dim1 - range_var dim2 = 0
-  isl_mat_set_element_si(eq_mat, /*row=*/0, /*col=*/dim1, 1);
-  isl_mat_set_element_si(eq_mat, /*row=*/0, /*col=*/num_domain_vars + dim2, -1);
+  // so the offset between a domain variable and its corresponding range
+  // variable is num_domain_vars
+  for (int domain_var = 0; domain_var < num_domain_vars; ++domain_var) {
+    // First constraint: domain_var dim1 - range_var dim2 = 0
+    if (domain_var == dim1) {
+      isl_mat_set_element_si(eq_mat, /*row=*/dim1, /*col=*/dim1, 1);
+      isl_mat_set_element_si(eq_mat, /*row=*/dim1,
+                             /*col=*/num_domain_vars + dim2, -1);
+      continue;
+    }
 
-  // Second constraint: domain_var dim2 - range_var dim1 = 0
-  isl_mat_set_element_si(eq_mat, /*row=*/1, /*col=*/dim2, 1);
-  isl_mat_set_element_si(eq_mat, /*row=*/1, /*col=*/num_domain_vars + dim1, -1);
+    if (domain_var == dim2) {
+      // Second constraint: domain_var dim2 - range_var dim1 = 0
+      isl_mat_set_element_si(eq_mat, /*row=*/dim2, /*col=*/dim2, 1);
+      isl_mat_set_element_si(eq_mat, /*row=*/dim2,
+                             /*col=*/num_domain_vars + dim1, -1);
+      continue;
+    }
+
+    // Otherwise, domain_var d - range_var d = 0
+    isl_mat_set_element_si(eq_mat, /*row=*/domain_var, /*col=*/domain_var, 1);
+    isl_mat_set_element_si(eq_mat, /*row=*/domain_var,
+                           /*col=*/num_domain_vars + domain_var, -1);
+  }
 
   isl_map* transpose =
       isl_map_from_basic_map(isl_basic_map_from_constraint_matrices(
