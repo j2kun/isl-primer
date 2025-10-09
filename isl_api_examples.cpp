@@ -190,9 +190,7 @@ std::string generate_loop_nest_as_c_str(isl_basic_map *bmap) {
   // Build the AST
   isl_ast_build *build = isl_ast_build_from_context(context);
   build = isl_ast_build_set_options(build, options);
-  std::cout << "Here6" << std::endl;
   isl_ast_node *tree = isl_ast_build_node_from_schedule_map(build, schedule);
-  std::cout << "Here7" << std::endl;
   isl_ast_build_free(build);
 
   char *cStr = isl_ast_node_to_C_str(tree);

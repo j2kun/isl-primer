@@ -1,5 +1,3 @@
-// A binary that runs parse_map_and_extract_domain_as_string from a stdin string
-
 #include <iostream>
 #include <string>
 

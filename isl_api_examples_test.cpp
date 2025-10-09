@@ -88,8 +88,8 @@ for (int c0 = 0; c0 <= 10; c0 += 1)
 )";
   EXPECT_EQ(actual, expected);
 
-  isl_ctx_free(ctx);
   isl_basic_map_free(bmap);
+  isl_ctx_free(ctx);
 }
 
 } // namespace
