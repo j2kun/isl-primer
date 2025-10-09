@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "gtest/gtest.h"
 #include "include/isl/ctx.h"
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -12,7 +12,7 @@ TEST(IslApiExamplesTest, TestParseMapAndExtractDomainAsString) {
       "{ [i] -> [j] : (-i + j) mod 7 = 0 and 0 <= i <= 20 and 0 <= j <= 20 }";
   std::string expected = "{ [i] : 0 <= i <= 20 }";
 
-  isl_ctx* ctx = isl_ctx_alloc();
+  isl_ctx *ctx = isl_ctx_alloc();
   std::string actual = parse_map_and_extract_domain_as_string(ctx, islMap);
   EXPECT_EQ(expected, actual);
   isl_ctx_free(ctx);
@@ -24,7 +24,7 @@ TEST(IslApiExamplesTest, TestParseMapAndExtractDomainAsStringSubset) {
   std::string expected =
       "{ [i] : 0 <= i <= 20 and 7*floor((-1 - i)/7) <= -4 - i }";
 
-  isl_ctx* ctx = isl_ctx_alloc();
+  isl_ctx *ctx = isl_ctx_alloc();
   std::string actual = parse_map_and_extract_domain_as_string(ctx, islMap);
   EXPECT_EQ(expected, actual);
   isl_ctx_free(ctx);
@@ -40,10 +40,40 @@ TEST(IslApiExamplesTest, TestPrecomposeTransposition) {
       "and 0 <= j <= 31 and 0 <= k <= 1023 and -15 + 32i + j + 2048k <= 16reg "
       "<= 32i + j + 2048k }";
 
-  isl_ctx* ctx = isl_ctx_alloc();
+  isl_ctx *ctx = isl_ctx_alloc();
   std::string actual = precompose_transposition(ctx, islMap, 0, 1);
   EXPECT_EQ(expected, actual);
   isl_ctx_free(ctx);
 }
 
-}  // namespace
+TEST(UtilsTest, TestEnumeratePoints) {
+  // Create a relation with 1 domain variable (x) and 1 range variable (y)
+  isl_ctx *ctx = isl_ctx_alloc();
+  isl_basic_map *bmap = isl_basic_map_read_from_str(
+      ctx, "{ [x] -> [y] : x >= 0 and 2 >= x and y >= 0 and 1 >= y }");
+  PointPairCollector collector(1, 1); // 1 domain dim, 1 range dim
+  enumerate_points(bmap, collector);
+
+  // Expected points: domain x range pairs for x in [0,2] and y in [0,1]
+  std::vector<std::pair<std::vector<int64_t>, std::vector<int64_t>>> expected =
+      {{{0}, {0}}, {{0}, {1}}, {{1}, {0}}, {{1}, {1}}, {{2}, {0}}, {{2}, {1}}};
+
+  EXPECT_EQ(collector.points.size(), expected.size());
+  for (const auto &expectedPoint : expected) {
+    bool found = false;
+    for (const auto &actualPoint : collector.points) {
+      if (actualPoint.first == expectedPoint.first &&
+          actualPoint.second == expectedPoint.second) {
+        found = true;
+        break;
+      }
+    }
+    EXPECT_TRUE(found) << "Expected point not found: domain="
+                       << expectedPoint.first[0]
+                       << ", range=" << expectedPoint.second[0];
+  }
+
+  isl_ctx_free(ctx);
+}
+
+} // namespace

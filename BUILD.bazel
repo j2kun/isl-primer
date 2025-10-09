@@ -21,6 +21,18 @@ cc_binary(
     deps = [":isl_api_examples"],
 )
 
+cc_binary(
+    name = "dump_constraints",
+    srcs = ["dump_constraints.cpp"],
+    deps = [":isl_api_examples"],
+)
+
+cc_binary(
+    name = "enumerate_points",
+    srcs = ["enumerate_points.cpp"],
+    deps = [":isl_api_examples"],
+)
+
 cc_test(
     name = "isl_api_examples_test",
     srcs = ["isl_api_examples_test.cpp"],

@@ -6,8 +6,12 @@
 #include "include/isl/ctx.h"
 #include "include/isl/map.h"
 #include "include/isl/map_type.h"
+#include "include/isl/point.h"
 #include "include/isl/set.h"
 #include "include/isl/space.h"
+#include "include/isl/space_type.h"
+#include "include/isl/val.h"
+#include "include/isl/val_type.h"
 
 std::string parse_map_and_extract_domain_as_string(isl_ctx* ctx,
                                                    std::string isl_str) {
@@ -102,9 +106,6 @@ std::string precompose_transposition(isl_ctx* ctx, std::string starting_layout,
 void print_matrices(isl_ctx* ctx, std::string isl_str) {
   isl_basic_set* set = isl_basic_set_read_from_str(ctx, isl_str.c_str());
 
-  // 2. Extract and print the equality matrix.
-  // Each row in this matrix represents a constraint of the form `expr = 0`.
-  // The columns are ordered: set dimensions, parameters, divisor, constant.
   isl_mat* eq_mat = isl_basic_set_equalities_matrix(
       set, isl_dim_set, isl_dim_div, isl_dim_param, isl_dim_cst);
 
@@ -112,7 +113,7 @@ void print_matrices(isl_ctx* ctx, std::string isl_str) {
   if (isl_mat_rows(eq_mat) == 0) {
     std::cout << "(No equalities)" << std::endl;
   } else {
-    isl_mat_print(eq_mat, stdout, ISL_FORMAT_ISL);
+    isl_mat_dump(eq_mat);
     std::cout << std::endl;
   }
 
@@ -125,11 +126,52 @@ void print_matrices(isl_ctx* ctx, std::string isl_str) {
   if (isl_mat_rows(ineq_mat) == 0) {
     std::cout << "(No inequalities)" << std::endl;
   } else {
-    isl_mat_print(ineq_mat, stdout, ISL_FORMAT_ISL);
+    isl_mat_dump(ineq_mat);
     std::cout << std::endl;
   }
 
   isl_mat_free(eq_mat);
   isl_mat_free(ineq_mat);
   isl_basic_set_free(set);
+}
+
+isl_stat pointPairCallback(__isl_take isl_point* pnt, void* user) {
+  PointPairCollector* collector = static_cast<PointPairCollector*>(user);
+
+  isl_space* space = isl_point_get_space(pnt);
+  isl_space_free(space);
+
+  std::vector<int64_t> domainPoint(collector->domain_dims);
+  std::vector<int64_t> rangePoint(collector->range_dims);
+
+  // Extract domain coordinates
+  for (int i = 0; i < collector->domain_dims; i++) {
+    isl_val* coord = isl_point_get_coordinate_val(pnt, isl_dim_set, i);
+    if (isl_val_is_int(coord)) {
+      domainPoint[i] = isl_val_get_num_si(coord);
+    }
+    isl_val_free(coord);
+  }
+
+  // Extract range coordinates
+  for (int i = 0; i < collector->range_dims; i++) {
+    isl_val* coord = isl_point_get_coordinate_val(pnt, isl_dim_set,
+                                                  collector->domain_dims + i);
+    if (isl_val_is_int(coord)) {
+      rangePoint[i] = isl_val_get_num_si(coord);
+    }
+    isl_val_free(coord);
+  }
+
+  collector->points.emplace_back(domainPoint, rangePoint);
+  isl_point_free(pnt);
+  return isl_stat_ok;
+}
+
+
+void enumerate_points(isl_basic_map *bmap,
+                     PointPairCollector& collector) {
+  isl_set* set = isl_set_from_basic_set(isl_basic_map_wrap(bmap));
+  isl_set_foreach_point(set, &pointPairCallback, &collector);
+  isl_set_free(set);
 }

@@ -16,3 +16,18 @@
 
 # a symbolic constant
 [N] -> { [i, j] : 0 < i < N and j > i and 0 < j < N }
+
+
+# an example that code-gens with an if guard
+{ [i0, i1] -> [ct, slot] : (i0 - i1 + ct) mod 16 = 0 and (-i0 + slot) mod 16 = 0 and 0 <= i0 <= 9 and 0 <= i1 <= 15 and 0 <= ct <= 15 and 0 <= slot <= 1023 }
+
+
+# An example of a 3d tensor mapping to vector registers
+{
+    S[i, j, k] -> [reg, lane] :
+        0 <= i < 32
+    and 0 <= j < 64
+    and 0 <= k < 1024
+    and 0 <= lane < 16
+    and i + j * 32 + k * 32 * 64 = 16 * reg + lane
+}
