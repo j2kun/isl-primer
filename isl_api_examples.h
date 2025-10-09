@@ -28,3 +28,5 @@ struct PointPairCollector {
 };
 
 void enumerate_points(isl_basic_map *bmap, PointPairCollector& collector);
+
+std::string generate_loop_nest_as_c_str(isl_basic_map* bmap);

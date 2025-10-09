@@ -46,7 +46,7 @@ TEST(IslApiExamplesTest, TestPrecomposeTransposition) {
   isl_ctx_free(ctx);
 }
 
-TEST(UtilsTest, TestEnumeratePoints) {
+TEST(IslApiExamplesTest, TestEnumeratePoints) {
   // Create a relation with 1 domain variable (x) and 1 range variable (y)
   isl_ctx *ctx = isl_ctx_alloc();
   isl_basic_map *bmap = isl_basic_map_read_from_str(
@@ -74,6 +74,22 @@ TEST(UtilsTest, TestEnumeratePoints) {
   }
 
   isl_ctx_free(ctx);
+}
+
+TEST(IslApiExamplesTest, TestGenerateLoopNestAsCStr) {
+  isl_ctx *ctx = isl_ctx_alloc();
+  auto *bmap = isl_basic_map_read_from_str(
+      ctx,
+      "{ S[d0, d1] -> [d1] : d0 - d1 = 0 and 0 <= d0 <= 10 and 0 <= d1 <= 10 }");
+  auto actual = generate_loop_nest_as_c_str(bmap);
+  std::string expected = R"(
+for (int c0 = 0; c0 <= 10; c0 += 1)
+  S(c0, c0);
+)";
+  EXPECT_EQ(actual, expected);
+
+  isl_ctx_free(ctx);
+  isl_basic_map_free(bmap);
 }
 
 } // namespace
