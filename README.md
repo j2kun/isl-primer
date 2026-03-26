@@ -1,8 +1,6 @@
 # ISL primer
 
-TODO: add link
-
-The code repository accompanying the blog post [Integer Set Library (ISL) - A Primer]()
+The code repository accompanying the blog post [Integer Set Library (ISL) - A Primer](https://www.jeremykun.com/2025/10/19/isl-a-primer/#generating-c-code)
 
 ## Dependencies
 
